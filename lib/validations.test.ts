@@ -18,6 +18,18 @@ describe('streakParamsSchema — grace fallback behavior', () => {
     expect(parse({ grace: '-1' }).grace).toBe(0);
   });
 
+  it('falls back or clamps a negative non-integer grace input safely', () => {
+    const result = streakParamsSchema.safeParse({
+      user: 'octocat',
+      grace: '-1.5',
+    });
+
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.grace).toBe(0);
+    }
+  });
+
   it('falls back to 1 for non-numeric grace value', () => {
     expect(parse({ grace: 'abc' }).grace).toBe(1);
   });
@@ -656,6 +668,21 @@ describe('streakParamsSchema — boolean transform fields', () => {
   });
 });
 
+describe('streakParamsSchema — org parameter validation', () => {
+  it('should reject org parameter with spaces and special characters', () => {
+    const result = streakParamsSchema.safeParse({
+      user: 'octocat',
+      org: 'invalid_org_name_with_spaces',
+    });
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      const fieldError = result.error.flatten().fieldErrors.org?.[0];
+      expect(fieldError).toBe('Invalid organization name format');
+    }
+  });
+});
+
 describe('ogParamsSchema', () => {
   it('should keep provided user value', () => {
     const result = ogParamsSchema.safeParse({
@@ -713,6 +740,15 @@ describe('ogParamsSchema', () => {
 
   it('should fallback to "dark" when an invalid theme is provided', () => {
     const result = ogParamsSchema.safeParse({ theme: 'nonexistent_theme_name' });
+
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.theme).toBe('dark');
+    }
+  });
+
+  it('falls back to dark theme when theme parameter is an empty string', () => {
+    const result = ogParamsSchema.safeParse({ theme: '' });
 
     expect(result.success).toBe(true);
     if (result.success) {
