@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import type { ImgHTMLAttributes } from 'react';
 import Leaderboard from './Leaderboard';
 vi.mock('next/image', () => ({
@@ -11,7 +11,11 @@ class MockIntersectionObserver {
   disconnect() {}
 }
 
-global.IntersectionObserver = MockIntersectionObserver as typeof IntersectionObserver;
+Object.defineProperty(window, 'IntersectionObserver', {
+  writable: true,
+  configurable: true,
+  value: MockIntersectionObserver,
+});
 
 describe('Leaderboard accessibility behavior', () => {
   const contributors = [
