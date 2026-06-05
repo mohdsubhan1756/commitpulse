@@ -357,14 +357,17 @@ export async function GET(request: Request) {
       const weakEtag = `W/"${etag}"`;
       const ifNoneMatch = request.headers.get('if-none-match');
 
-      if (ifNoneMatch === weakEtag || ifNoneMatch === `"${etag}"`) {
-        return new NextResponse(null, {
-          status: 304,
-          headers: {
-            'Cache-Control': cacheControl,
-            ETag: weakEtag,
-          },
-        });
+      if (ifNoneMatch) {
+        const etags = ifNoneMatch.split(',').map(e => e.trim());
+        if (etags.includes(weakEtag) || etags.includes(`"${etag}"`)) {
+          return new NextResponse(null, {
+            status: 304,
+            headers: {
+              'Cache-Control': cacheControl,
+              ETag: weakEtag,
+            },
+          });
+        }
       }
 
       return new NextResponse(jsonPayload, {
@@ -416,14 +419,17 @@ export async function GET(request: Request) {
     const weakEtag = `W/"${etag}"`;
     const ifNoneMatch = request.headers.get('if-none-match');
 
-    if (ifNoneMatch === weakEtag || ifNoneMatch === `"${etag}"`) {
-      return new NextResponse(null, {
-        status: 304,
-        headers: {
-          'Cache-Control': cacheControl,
-          ETag: weakEtag,
-        },
-      });
+    if (ifNoneMatch) {
+      const etags = ifNoneMatch.split(',').map(e => e.trim());
+      if (etags.includes(weakEtag) || etags.includes(`"${etag}"`)) {
+        return new NextResponse(null, {
+          status: 304,
+          headers: {
+            'Cache-Control': cacheControl,
+            ETag: weakEtag,
+          },
+        });
+      }
     }
 
     return new NextResponse(svg, {
