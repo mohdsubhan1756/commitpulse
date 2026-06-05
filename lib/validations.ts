@@ -330,14 +330,11 @@ const baseStreakParamsSchema = z.object({
     .default(false),
   gradient_stops: z
     .string()
-    .max(200, { 
+    .max(200, {
       message: 'gradient_stops cannot exceed 200 characters',
     })
     .optional(),
-  gradient_dir: z
-    .enum(['vertical', 'horizontal', 'diagonal'])
-    .catch('vertical')
-    .optional(),
+  gradient_dir: z.enum(['vertical', 'horizontal', 'diagonal']).catch('vertical').optional(),
   disable_particles: z
     .string()
     .optional()
